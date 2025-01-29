@@ -32,17 +32,17 @@ void	Bank::createAccount(int id, int value)
 	clientAccounts.push_back(new Account(id, value - fee));
 }
 
-void	Bank::addMoneyToAccount(int id, int value)
+void	Bank::modifyMoneyAccount(int id, int value)
 {
 	int		fee;
 	Account	*account;
 
-	if (value < 0 || id < 0)
+	if (id < 0)
 	{
 		std::cerr << "Invalid account creation" << std::endl;
 		return ;
 	}
-	fee = static_cast<int>(value * 0.05);
+	fee = static_cast<int>(std::abs(value) * 0.05);
 	account = getAccount(id);
 	if (!account)
 	{
@@ -116,6 +116,6 @@ void	printAccounts(const Bank &bank)
 
 	for (; it != ite; it++)
 	{
-		std::cout << "Account " << (*it)->getId() << " : " << (*it)->getValue() << std::endl;
+		std::cout << "Account ID: " << (*it)->getId() << " Value: " << (*it)->getValue() << std::endl;
 	}
 }
