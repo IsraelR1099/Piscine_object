@@ -21,5 +21,6 @@ class	Bank
 		void			modifyMoneyAccount(int id, int value);
 		void			removeAccount(int id);
 		void			giveLoan(int id, int value);
+		const int		&getAccountValue(int id);
 		~Bank();
 };

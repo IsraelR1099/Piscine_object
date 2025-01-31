@@ -6,7 +6,7 @@
 #    By: irifarac <irifarac@student42.barcel>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/05/14 20:28:25 by irifarac          #+#    #+#              #
-#    Updated: 2025/01/26 17:48:58 by israel           ###   ########.fr        #
+#    Updated: 2025/01/31 10:58:08 by irifarac         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,6 +24,7 @@ SRC = $(SRC_DIR)/main.cpp \
 OBJ = $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 DEP = $(addsuffix .d, $(basename $(OBJ)))
 
+CC := c++
 WARNING_FLAGS := -Wall -Wextra -Werror -Wshadow -Wundef -pedantic -MMD
 STD_FLAGS := -std=c++98
 DEBUG_FLAGS := -g -Og
@@ -36,12 +37,12 @@ all: $(NAME)
 -include $(DEP)
 $(NAME): $(OBJ)
 	@echo "$(GREEN)Creating binary $(NAME)$(RESET)"
-	c++ $(OBJ) $(CXXFLAGS) -o $(NAME)
+	$(CC) $(OBJ) $(CXXFLAGS) -o $(NAME)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp Makefile
 	@echo "$(GREEN)Compiling.. $<$(RESET)"
 	@mkdir -p $(@D)
-	c++ $(CXXFLAGS) -c $< -o $@
+	$(CC) $(CXXFLAGS) -c $< -o $@
 
 clean:
 ifneq ("$(wildcard $(OBJ) $(DEP) $(OBJ_DIR))", "")

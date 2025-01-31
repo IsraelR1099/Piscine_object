@@ -36,6 +36,7 @@ void	Bank::modifyMoneyAccount(int id, int value)
 {
 	int		fee;
 	Account	*account;
+	int		netValue;
 
 	if (id < 0)
 	{
@@ -47,6 +48,12 @@ void	Bank::modifyMoneyAccount(int id, int value)
 	if (!account)
 	{
 		std::cerr << "Account not found" << std::endl;
+		return ;
+	}
+	netValue = account->getValue() + (value - fee);
+	if (netValue < -1000)
+	{
+		std::cerr << "You are bankrupt\n";
 		return ;
 	}
 	m_liquidity += fee;
@@ -78,6 +85,8 @@ void	Bank::removeAccount(int id)
 void	Bank::giveLoan(int id, int value)
 {
 	Account	*account;
+	int		fee;
+	int		netLoan;
 
 	if (value < 0 || id < 0)
 	{
@@ -92,11 +101,30 @@ void	Bank::giveLoan(int id, int value)
 	account = getAccount(id);
 	if (account)
 	{
+		fee = static_cast<int>(value * 0.05);
+		netLoan = value - fee;
 		m_liquidity -= value;
-		account->addValue(value);
+		account->addValue(netLoan);
+		m_liquidity += fee;
 	}
 	else
 		std::cerr << "Account not found" << std::endl;
+}
+
+const int	&Bank::getAccountValue(int id)
+{
+	Account	*account;
+
+	if (id < 0)
+	{
+		std::cerr << "ID not valid\n";
+	}
+	account = getAccount(id);
+	if (!account)
+	{
+		std::cerr << "Account not found\n";
+	}
+	return (account->getValue());
 }
 
 Bank::~Bank()

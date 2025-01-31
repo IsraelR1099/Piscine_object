@@ -1,57 +1,88 @@
 #include "Bank.hpp"
+#include "../includes/tests.hpp"
 
 void	printAccounts(const Bank &bank);
 
-static bool	testCreate()
+static void	test_bank_fee()
 {
-	bool	ret;
+	Bank	bank;
 
-	ret = false;
-	std::cout << "Creating with default values\n";
-	{
-		Bank	test;
+	bank.createAccount(1, 100);
+	bank.modifyMoneyAccount(1, 100);
 
-		std::cout << "Default liquidity: " << test.getLiquidity() << std::endl;
-		test.createAccount();
-		printAccounts(test);
-		ret = true;
-	}
-	std::cout << "Duplicate IDs\n";
-	{
-		Bank	test;
-		Bank	testDuplicate;
-
-		test.createAccount(1, 500);
-		test.createAccount();
-		std::cout << "test liquidity: " << test.getLiquidity() << std::endl;
-		test.modifyMoneyAccount(1, -1200);
-		std::cout << "test liquidity: " << test.getLiquidity() << std::endl;
-		printAccounts(test);
-	}
-	return (ret);
+	ASSERT(bank.getLiquidity() == 10, "Bank receives 10% of deposits");
 }
 
-static void	testDelete()
+static void	test_unique_account_id()
+{
+	Bank	bank;
+
+	bank.createAccount(1, 100);
+	bank.createAccount(1, 200);
+
+	ASSERT(bank.getAccounts().size() == 1,
+			"Duplicate accounts should not be created"
+			);
+}
+
+static void	test_account_deletion()
 {
 	{
-		Bank	test;
+		Bank	bank;
 
-		test.createAccount(2, 200);
-		printAccounts(test);
-		test.removeAccount(2);
-		printAccounts(test);
+		bank.createAccount(1, 100);
+		bank.removeAccount(1);
+		ASSERT(bank.getAccounts().empty(),
+				"Account should be deleted"
+				);
 	}
+	Bank	bank;
+
+	bank.createAccount(1, 100);
+	bank.createAccount(2, 100);
+	bank.createAccount(10, 100);
+	bank.removeAccount(1);
+	bank.removeAccount(3); // ID does not exist
+	bank.removeAccount(10);
+	ASSERT(bank.getAccounts().size() == 1,
+			"Account should be deleted");
+}
+
+static void	test_give_loan()
+{
+	Bank	bank(100);
+
+	bank.createAccount(1, 50);
+	bank.giveLoan(1, 50);
+	ASSERT(bank.getAccountValue(1) == 96,
+			"Bank must be able to give a loan with a fee");
+	bank.giveLoan(1, 5000); // Not enough liquidity
+}
+
+static void	test_modify_value()
+{
+	Bank	bank;
+
+	bank.createAccount(1, 200);
+	bank.modifyMoneyAccount(1, 100);
+	ASSERT(bank.getAccountValue(1) == 285,
+			"Bank must be able to modify the account value");
+}
+
+void	run_bank_tests()
+{
+	std::cout << "\n=== Running Bank Tests ===\n";
+	test_bank_fee();
+	test_unique_account_id();
+	test_account_deletion();
+	test_give_loan();
+	test_modify_value();
+	std::cout << "\n=== Finished Bank Tests ===\n";
 }
 
 int	main()
 {
-	if (testCreate())
-	{
-		std::cout << "Test create passed\n";
-	}
-	else
-		std::cout << "Test create failed\n";
-	testDelete();
+	run_bank_tests();
 	return (0);
 }
 
