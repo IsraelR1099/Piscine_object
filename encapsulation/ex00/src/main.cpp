@@ -1,4 +1,4 @@
-#include "Bank.hpp"
+#include "../includes/Bank.hpp"
 #include "../includes/tests.hpp"
 
 void	printAccounts(const Bank &bank);
