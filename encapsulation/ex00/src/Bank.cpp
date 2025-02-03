@@ -1,4 +1,5 @@
 #include "../includes/Bank.hpp"
+#include "Bank.hpp"
 
 void	Bank::createAccount(int id, int value)
 {

@@ -32,7 +32,8 @@ class	Bank
 		void			removeAccount(int id);
 		void			giveLoan(int id, int value);
 		const int		&getAccountValue(int id);
-		const Account	&operator[](int id) const;
+        Bank::Account &operator[](int id);
+        const Account	&operator[](int id) const;
 		const std::vector<Account *>	&getAccounts() const { return (clientAccounts); }
 		~Bank();
 };
