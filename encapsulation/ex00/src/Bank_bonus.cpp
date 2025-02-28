@@ -1,43 +1,23 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Bank.cpp                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: irifarac <marvin@42.fr>                    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/02/28 12:52:51 by irifarac          #+#    #+#             */
-/*   Updated: 2025/02/28 12:52:53 by irifarac         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
+#include "../includes/Bank.hpp"
 #include "Bank.hpp"
-
-Account	*Bank::getAccount(int id)
-{
-	std::vector<Account *>::iterator	it = clientAccounts.begin();
-	std::vector<Account *>::iterator	ite = clientAccounts.end();
-
-	for (; it != ite; it++)
-	{
-		if ((*it)->getId() == id)
-			return (*it);
-	}
-	return (NULL);
-}
 
 void	Bank::createAccount(int id, int value)
 {
-	int	fee;
+	int		fee;
 
 	if (id < 0 || value < 0)
 	{
 		std::cerr << "Invalid account creation" << std::endl;
 		return ;
 	}
-	if (getAccount(id))
+	try
 	{
-		std::cerr << "Account already exists" << std::endl;
-		return ;
+		const Account	&account = (*this)[id];
+		(void)account;
+		throw std::invalid_argument("Account already exists");
+	}
+	catch (std::out_of_range &e)
+	{
 	}
 	fee = static_cast<int>(value * 0.05);
 	m_liquidity += fee;
@@ -46,9 +26,9 @@ void	Bank::createAccount(int id, int value)
 
 void	Bank::modifyMoneyAccount(int id, int value)
 {
-	int		fee;
-	Account	*account;
-	int		netValue;
+	int				fee;
+	Account	&account = (*this)[id];
+	int				netValue;
 
 	if (id < 0)
 	{
@@ -56,20 +36,14 @@ void	Bank::modifyMoneyAccount(int id, int value)
 		return ;
 	}
 	fee = static_cast<int>(std::abs(value) * 0.05);
-	account = getAccount(id);
-	if (!account)
-	{
-		std::cerr << "Account not found" << std::endl;
-		return ;
-	}
-	netValue = account->getValue() + (value - fee);
+	netValue = account.getValue() + (value - fee);
 	if (netValue < -1000)
 	{
 		std::cerr << "You are bankrupt\n";
 		return ;
 	}
 	m_liquidity += fee;
-	account->addValue(value - fee);
+	account.m_value = netValue;
 }
 
 void	Bank::removeAccount(int id)
@@ -137,6 +111,25 @@ const int	&Bank::getAccountValue(int id)
 		std::cerr << "Account not found\n";
 	}
 	return (account->getValue());
+}
+
+Bank::Account	&Bank::operator[](int id)
+{
+	if (id < 0)
+		throw std::out_of_range("ID not valid");
+	if (id >= static_cast<int>(clientAccounts.size()))
+		throw std::out_of_range("Account not found");
+	return (*clientAccounts[id]);
+}
+
+
+const Bank::Account	&Bank::operator[](int id) const
+{
+	if (id < 0)
+		throw std::out_of_range("ID not valid");
+	if (id >= static_cast<int>(clientAccounts.size()))
+		throw std::out_of_range("Account not found");
+	return (*clientAccounts[id]);
 }
 
 Bank::~Bank()
